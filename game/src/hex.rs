@@ -45,4 +45,20 @@ impl Hex {
     pub fn from_axial(q: i32, r: i32) -> Self {
         Self::new(q, r)
     }
+
+    pub fn world_to_hex(cursor_pos: Vec2, hex_size: f32) -> Hex {
+        let q = (3.0_f32.sqrt() / 3.0 * cursor_pos.x - 1.0 / 3.0 * cursor_pos.y) / hex_size;
+        let r = (2.0 / 3.0 * cursor_pos.y) / hex_size;
+    
+        let q_round = q.round() as i32;
+        let r_round = r.round() as i32;
+    
+        Hex::new(q_round, r_round)
+    }
+
+    pub fn hex_to_world_position(hex: Hex, hex_size: f32) -> Vec2 {
+        let x = hex_size * 3.0_f32.sqrt() * (hex.q as f32 + hex.r as f32 / 2.0);
+        let y = hex_size * 1.5 * hex.r as f32;
+        Vec2::new(x, y)
+    }
 }

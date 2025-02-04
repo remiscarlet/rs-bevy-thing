@@ -6,6 +6,6 @@ pub struct HexGridPlugin;
 
 impl Plugin for HexGridPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, systems::initialize_hex_map);
+        app.add_systems(Update, systems::initialize_map_hex);
     }
 }
