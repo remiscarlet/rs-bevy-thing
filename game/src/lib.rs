@@ -3,15 +3,15 @@ use bevy::prelude::*;
 use crate::assets::GameAssetPlugin;
 use crate::camera::CameraPlugin;
 use crate::config::ConfigPlugin;
-use crate::input::InputPlugin;
 use crate::hex::HexGridPlugin;
+use crate::input::InputPlugin;
 use crate::map::MapPlugin;
 
 mod assets;
 mod camera;
 mod config;
-mod input;
 mod hex;
+mod input;
 mod map;
 
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash)]
@@ -23,16 +23,15 @@ enum GameState {
 // Implement `FromWorld` so `init_state` works
 impl FromWorld for GameState {
     fn from_world(_world: &mut World) -> Self {
-        GameState::InGame // 👈 Choose a reasonable default
+        GameState::InGame
     }
 }
-
 
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.init_state::<GameState>() // ✅ Use `add_state`, NOT `init_state`
+        app.init_state::<GameState>()
             .add_plugins(InputPlugin)
             .add_plugins(GameAssetPlugin)
             .add_plugins(HexGridPlugin)

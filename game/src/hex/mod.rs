@@ -21,19 +21,17 @@ impl Hex {
 
     /// Get the neighboring hex in a given direction
     pub fn neighbor(&self, direction: usize) -> Self {
-        let directions = [
-            (1, 0), (1, -1), (0, -1),
-            (-1, 0), (-1, 1), (0, 1)
-        ];
+        let directions = [(1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1), (0, 1)];
         let (dq, dr) = directions[direction % 6];
         Self::new(self.q + dq, self.r + dr)
     }
 
     /// Calculate the distance between two hexes
-    pub fn distance_to(&self, other: &Hex) -> i32 {
-        ((self.q - other.q).abs()
-            + (self.r - other.r).abs()
-            + (self.s - other.s).abs()) / 2
+    pub fn distance_to(&self, other: &Hex) -> u32 {
+        ((self.q - other.q).unsigned_abs()
+            + (self.r - other.r).unsigned_abs()
+            + (self.s - other.s).unsigned_abs())
+            / 2
     }
 
     /// Convert cube coordinates to axial (q, r)
@@ -46,13 +44,13 @@ impl Hex {
         Self::new(q, r)
     }
 
-    pub fn world_to_hex(cursor_pos: Vec2, hex_size: f32) -> Hex {
-        let q = (3.0_f32.sqrt() / 3.0 * cursor_pos.x - 1.0 / 3.0 * cursor_pos.y) / hex_size;
-        let r = (2.0 / 3.0 * cursor_pos.y) / hex_size;
-    
+    pub fn world_to_hex(world_pos: Vec2, hex_size: f32) -> Hex {
+        let q = (3.0_f32.sqrt() / 3.0 * world_pos.x - 1.0 / 3.0 * world_pos.y) / hex_size;
+        let r = (2.0 / 3.0 * world_pos.y) / hex_size;
+
         let q_round = q.round() as i32;
         let r_round = r.round() as i32;
-    
+
         Hex::new(q_round, r_round)
     }
 

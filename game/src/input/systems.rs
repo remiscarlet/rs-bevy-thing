@@ -1,4 +1,8 @@
-use bevy::{input::mouse::MouseMotion, math::VectorSpace, prelude::*};
+use bevy::{
+    input::mouse::{MouseButtonInput, MouseMotion},
+    math::VectorSpace,
+    prelude::*,
+};
 
 use crate::GameState;
 
@@ -11,36 +15,49 @@ pub fn process_button_input(
 ) {
     let mut movement = Vec2::ZERO;
 
-    if keys.pressed(KeyCode::KeyW) { movement.y += 1.0; }
-    if keys.pressed(KeyCode::KeyS) { movement.y -= 1.0; }
-    if keys.pressed(KeyCode::KeyA) { movement.x -= 1.0; }
-    if keys.pressed(KeyCode::KeyD) { movement.x += 1.0; }
+    if keys.pressed(KeyCode::KeyW) {
+        movement.y += 1.0;
+    }
+    if keys.pressed(KeyCode::KeyS) {
+        movement.y -= 1.0;
+    }
+    if keys.pressed(KeyCode::KeyA) {
+        movement.x -= 1.0;
+    }
+    if keys.pressed(KeyCode::KeyD) {
+        movement.x += 1.0;
+    }
 
     if movement != Vec2::ZERO {
         match game_state.get() {
             GameState::InGame => input_writer.send(InputEvent(InputAction::MovePlayer(movement))),
-            GameState::MainMenu => input_writer.send(InputEvent(InputAction::NavigateMenu(movement))),
+            GameState::MainMenu => {
+                input_writer.send(InputEvent(InputAction::NavigateMenu(movement)))
+            }
         };
     }
 }
 
-pub fn process_mouse_motion(
-    mut evr_motion: EventReader<MouseMotion>,
+pub fn process_cursor_moved(
+    mut cursor_moved_reader: EventReader<CursorMoved>,
+    mouse_buttons: Res<ButtonInput<MouseButton>>,
     mut input_writer: EventWriter<InputEvent>,
-    game_state: Res<State<GameState>>, // Assume we have some game state
+    game_state: Res<State<GameState>>,
 ) {
-    for ev in evr_motion.read() {
-        println!("Mouse moved: X: {} px, Y: {} px", ev.delta.x, ev.delta.y);
+    let mut movement = Vec2::ZERO;
+    // Accumulate mouse movement from all events
+    for ev in cursor_moved_reader.read() {
+        if let Some(delta) = ev.delta {
+            movement += delta;
+        }
+    }
 
-        let movement = Vec2::from([
-            ev.delta.x,
-            ev.delta.y,
-        ]);
-
-        match game_state.get() {
-            GameState::InGame => {
+    if movement != Vec2::ZERO {
+        match (game_state.get(), mouse_buttons.pressed(MouseButton::Right)) {
+            (GameState::InGame, true) => {
+                println!("Sending movement: {:?}", movement);
                 input_writer.send(InputEvent(InputAction::MoveCamera(movement)));
-            },
+            }
             _ => (),
         };
     }
