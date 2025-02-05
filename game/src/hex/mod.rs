@@ -4,6 +4,14 @@ mod systems;
 
 pub use plugin::HexGridPlugin;
 
+#[derive(Resource, PartialEq, Eq, PartialOrd, Ord)]
+pub struct SelectedHexEntity(Option<Entity>);
+
+#[derive(Component)]
+pub struct Selected;
+#[derive(Component)]
+pub struct Highlighted;
+
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Hex {
     q: i32, // Column (Axial X)
@@ -15,7 +23,6 @@ impl Hex {
     /// Create a new hex coordinate ensuring the constraint q + r + s = 0
     pub fn new(q: i32, r: i32) -> Self {
         let s = -q - r;
-        println!("Spawning new Hex entity at ({}, {}, {})", q, r, s);
         Self { q, r, s }
     }
 

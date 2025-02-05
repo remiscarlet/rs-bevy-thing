@@ -8,8 +8,10 @@ impl Plugin for ConfigPlugin {
         app.insert_resource(Config {
             hex_size: 50.0,
             camera_scale: 100.0,
-            highlight_color: Color::linear_rgb(255.0, 0.0, 0.0),
-            default_highlight_color: Color::WHITE,
+
+            default_hex_color: Color::WHITE,
+            highlighted_hex_color: Color::linear_rgba(255.0, 0.0, 0.0, 0.5),
+            selected_hex_color: Color::linear_rgba(100.0, 0.0, 100.0, 0.5),
         });
     }
 }

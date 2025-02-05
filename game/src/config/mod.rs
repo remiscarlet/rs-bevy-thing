@@ -8,6 +8,8 @@ pub use plugin::ConfigPlugin;
 pub struct Config {
     pub hex_size: f32,
     pub camera_scale: f32,
-    pub highlight_color: Color,
-    pub default_highlight_color: Color,
+
+    pub highlighted_hex_color: Color,
+    pub selected_hex_color: Color,
+    pub default_hex_color: Color,
 }

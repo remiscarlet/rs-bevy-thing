@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use space_editor::SpaceEditorPlugin;
+
 use game::GamePlugin;
 
 fn main() {

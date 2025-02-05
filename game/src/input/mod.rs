@@ -7,7 +7,9 @@ pub use plugin::InputPlugin;
 
 pub enum InputAction {
     MovePlayer(Vec2),
-    MoveCamera(Vec2),
+    GameClick(MouseButton, Vec2),
+    MenuClick(MouseButton, Vec2),
+    DragCamera(Vec2),
     NavigateMenu(Vec2),
 }
 
