@@ -4,10 +4,10 @@ use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{
     camera::GameCameraMarker,
-    config::Config,
     hex::Selected,
     input::{InputAction, InputEvent},
     map::Map,
+    state::ConfigState,
 };
 
 use super::{Hex, Highlighted, SelectedHexEntity};
@@ -24,7 +24,7 @@ pub fn log_new_hex(query: Query<(&Hex, &Transform), Added<Hex>>) {
 
 pub fn initialize_map_hex(
     mut commands: Commands,
-    config: Res<Config>,
+    config: Res<ConfigState>,
     query: Query<(Entity, &Map, &Name), Added<Map>>,
     game_assets: Res<GameAssets>,
 ) {
@@ -58,7 +58,7 @@ pub fn highlight_hovered_hex(
     mut commands: Commands,
     mut query: Query<(Entity, &Hex)>,
     mut previous_highlighted: Local<Option<Entity>>,
-    config: Res<Config>,
+    config: Res<ConfigState>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera_query: Single<(&Camera, &GlobalTransform), With<GameCameraMarker>>,
 ) {
@@ -103,7 +103,7 @@ pub fn select_clicked_hex(
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mut input_reader: EventReader<InputEvent>,
     mut selected_hex_entity: ResMut<SelectedHexEntity>,
-    config: Res<Config>,
+    config: Res<ConfigState>,
 ) {
     let mut clicked_hex_entity: Option<Entity> = None;
 
@@ -179,7 +179,7 @@ pub fn move_selected_hex(
 
 pub fn update_sprite_colors(
     mut query: Query<(&mut Sprite, Option<&Highlighted>, Option<&Selected>)>,
-    config: Res<Config>,
+    config: Res<ConfigState>,
 ) {
     for (mut sprite, is_highlighted, is_selected) in query.iter_mut() {
         if is_selected.is_some() {

@@ -1,25 +1,20 @@
 use bevy::prelude::*;
 
-pub fn update_cursor_state(
-    mut cursor_moved_events: EventReader<CursorMoved>,
-    windows: Query<&Window>,
-    mut state: ResMut<WindowInteractionState>,
-) {
-    let window = windows.single();
+use crate::input::{InputAction, InputEvent};
 
-    for event in cursor_moved_events.read() {
-        state.cursor_inside = event.position.x >= 0.0
-            && event.position.x <= window.width()
-            && event.position.y >= 0.0
-            && event.position.y <= window.height();
-    }
-}
+use super::GameRuntimeState;
 
-pub fn update_focus_state(
-    mut focus_events: EventReader<WindowFocused>,
-    mut state: ResMut<WindowInteractionState>,
+pub fn toggle_debug_state(
+    mut game_state: ResMut<GameRuntimeState>,
+    mut input_reader: EventReader<InputEvent>,
 ) {
-    for event in focus_events.read() {
-        state.window_focused = event.focused;
+    for event in input_reader.read() {
+        if let InputEvent(InputAction::ToggleDebug) = event {
+            game_state.debug = !(game_state.debug);
+            println!(
+                "Got ToggleDebug event! Debug is now: {:?}",
+                game_state.debug
+            );
+        }
     }
 }

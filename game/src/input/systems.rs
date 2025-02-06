@@ -4,15 +4,21 @@ use bevy::{
     prelude::*,
 };
 
-use crate::GameState;
+use crate::GameSceneState;
 
 use super::{InputAction, InputEvent};
 
 pub fn process_button_input(
     keys: Res<ButtonInput<KeyCode>>,
     mut input_writer: EventWriter<InputEvent>,
-    game_state: Res<State<GameState>>, // Assume we have some game state
+    game_state: Res<State<GameSceneState>>, // Assume we have some game state
 ) {
+    
+    if keys.just_pressed(KeyCode::Backquote) {
+        println!("Sending ToggleDebug");
+        input_writer.send(InputEvent(InputAction::ToggleDebug));
+    }
+
     let mut movement = Vec2::ZERO;
 
     if keys.just_pressed(KeyCode::KeyW) {
@@ -30,23 +36,40 @@ pub fn process_button_input(
 
     if movement != Vec2::ZERO {
         match game_state.get() {
-            GameState::InGame => {
+            GameSceneState::InGame => {
                 println!("Sending MovePlayer: {:?}", movement);
                 input_writer.send(InputEvent(InputAction::MovePlayer(movement)));
             }
-            GameState::MainMenu => {
+            GameSceneState::MainMenu => {
                 println!("Sending NavigateMenu: {:?}", movement);
                 input_writer.send(InputEvent(InputAction::NavigateMenu(movement)));
             }
         };
     }
+    // process_debug_input(&keys, &input_writer);
+    // process_movement_input(&keys, &input_writer, &game_state);
+}
+
+fn process_debug_input(
+    keys: &Res<ButtonInput<KeyCode>>,
+    mut input_writer: &EventWriter<InputEvent>,
+) {
+    
+}
+
+fn process_movement_input(
+    keys: &Res<ButtonInput<KeyCode>>,
+    mut input_writer: &EventWriter<InputEvent>,
+    game_state: &Res<State<GameSceneState>>,
+) {
+    
 }
 
 pub fn process_cursor_moved(
     mut cursor_moved_reader: EventReader<CursorMoved>,
     mouse_buttons: Res<ButtonInput<MouseButton>>,
     mut input_writer: EventWriter<InputEvent>,
-    game_state: Res<State<GameState>>,
+    game_state: Res<State<GameSceneState>>,
 ) {
     let mut movement = Vec2::ZERO;
     // Accumulate mouse movement from all events
@@ -58,7 +81,7 @@ pub fn process_cursor_moved(
 
     if movement != Vec2::ZERO {
         match (game_state.get(), mouse_buttons.pressed(MouseButton::Right)) {
-            (GameState::InGame, true) => {
+            (GameSceneState::InGame, true) => {
                 println!("Sending movement: {:?}", movement);
                 input_writer.send(InputEvent(InputAction::DragCamera(movement)));
             }
@@ -71,12 +94,12 @@ pub fn process_cursor_clicked(
     windows: Query<&Window>,
     mouse_buttons: Res<ButtonInput<MouseButton>>,
     mut input_writer: EventWriter<InputEvent>,
-    game_state: Res<State<GameState>>,
+    game_state: Res<State<GameSceneState>>,
 ) {
     if let Ok(window) = windows.get_single() {
         if let Some(cursor_pos) = window.cursor_position() {
             match (game_state.get()) {
-                (GameState::InGame) => {
+                (GameSceneState::InGame) => {
                     for mouse_button in mouse_buttons.get_just_pressed() {
                         println!("Sending game click: {:?}", mouse_button);
                         input_writer.send(InputEvent(InputAction::GameClick(
@@ -85,7 +108,7 @@ pub fn process_cursor_clicked(
                         )));
                     }
                 }
-                (GameState::MainMenu) => {
+                (GameSceneState::MainMenu) => {
                     for mouse_button in mouse_buttons.get_just_pressed() {
                         println!("Sending menu click: {:?}", mouse_button);
                         input_writer.send(InputEvent(InputAction::MenuClick(
