@@ -61,9 +61,25 @@ impl Hex {
         Hex::new(q_round, r_round)
     }
 
+    /**
+     * - Key intuition:
+     *   - Assume pointy top hexagons
+     *   - `size` is defined as the radius of the circle enclosing a hexagon (outer circle)
+     *   - 1) the width of the hexagon, asset, and horizontal spacing = `sqrt(3) * size`
+     *   - 2) The HEIGHT of the hexagon, asset = `2 * size`
+     *   - 3) The VERTICAL SPACING between two hexagons = `3/2 * size`
+     */
+    /**
+     * Source: https://www.redblobgames.com/grids/hexagons/#hex-to-pixel-axial
+     */
     pub fn hex_to_world_position(hex: Hex, hex_size: f32) -> Vec2 {
         let x = hex_size * 3.0_f32.sqrt() * (hex.q as f32 + hex.r as f32 / 2.0);
         let y = hex_size * 1.5 * hex.r as f32;
         Vec2::new(x, y)
     }
+    // pub fn hex_to_world_position(hex: Hex, hex_size: f32) -> Vec2 {
+    //     let x = hex_size * 3.0_f32.sqrt() / 2.0 * hex.q as f32;
+    //     let y = hex_size * 1.5 * hex.r as f32;
+    //     Vec2::new(x, y)
+    // }
 }

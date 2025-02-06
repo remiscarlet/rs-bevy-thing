@@ -1,4 +1,7 @@
-use bevy_console::{clap::{command, Parser}, ConsoleCommand};
+use bevy_console::{
+    clap::{command, Parser},
+    ConsoleCommand,
+};
 
 /// Example command
 #[derive(Parser, ConsoleCommand)]

@@ -1,20 +1,24 @@
 use std::u32;
 
-use bevy::{
-    prelude::*,
-    window::PrimaryWindow,
-};
+use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::{camera::GameCameraMarker, config::Config, hex::Selected, input::{InputAction, InputEvent}, map::Map};
+use crate::{
+    camera::GameCameraMarker,
+    config::Config,
+    hex::Selected,
+    input::{InputAction, InputEvent},
+    map::Map,
+};
 
 use super::{Hex, Highlighted, SelectedHexEntity};
 use crate::assets::GameAssets;
 
-pub fn log_new_hex(
-    query: Query<&Hex, Added<Hex>>,
-) {
-    for Hex { q, r, s} in query.iter() {
-        println!("Spawning new Hex entity at ({}, {}, {})", q, r, s);
+pub fn log_new_hex(query: Query<(&Hex, &Transform), Added<Hex>>) {
+    for (Hex { q, r, s }, transform) in query.iter() {
+        println!(
+            "Spawning new Hex entity at ({}, {}, {}) in ({}, {})",
+            q, r, s, transform.translation.x, transform.translation.y
+        );
     }
 }
 
@@ -31,7 +35,12 @@ pub fn initialize_map_hex(
                 let hex = Hex::new(i32::from(q), i32::from(r));
                 let position = Hex::hex_to_world_position(hex, config.hex_size);
 
-                let sprite = Sprite::from_image(game_assets.hex_tile.clone());
+                let mut sprite = Sprite::from_image(game_assets.hex_tile.clone());
+                sprite.custom_size = Some(Vec2::new(
+                    config.hex_size * 3f32.sqrt(),
+                    config.hex_size * 2f32,
+                ));
+
                 commands
                     .spawn((
                         sprite,
@@ -103,7 +112,13 @@ pub fn select_clicked_hex(
         if let InputEvent(InputAction::GameClick(MouseButton::Left, cursor_pos)) = event {
             if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, *cursor_pos) {
                 let clicked_hex = Hex::world_to_hex(world_pos, config.hex_size);
-                println!("{:?} at {:?} (world_pos: {:?}). Clicked hex: {:?}", MouseButton::Left, cursor_pos, world_pos, clicked_hex);
+                println!(
+                    "{:?} at {:?} (world_pos: {:?}). Clicked hex: {:?}",
+                    MouseButton::Left,
+                    cursor_pos,
+                    world_pos,
+                    clicked_hex
+                );
 
                 for (entity, hex) in hex_query.iter() {
                     if *hex == clicked_hex {
@@ -136,7 +151,9 @@ pub fn move_selected_hex(
     for event in input_reader.read() {
         if let InputEvent(InputAction::MovePlayer(direction)) = event {
             if let SelectedHexEntity(Some(selected_entity)) = *selected_hex_entity {
-                if let Ok((prev_selected_entity, prev_selected_hex)) = hex_query.get(selected_entity) {
+                if let Ok((prev_selected_entity, prev_selected_hex)) =
+                    hex_query.get(selected_entity)
+                {
                     let (mut q, mut r) = prev_selected_hex.to_axial();
 
                     q += direction.x.round() as i32;
@@ -146,12 +163,12 @@ pub fn move_selected_hex(
 
                     for (new_selected_entity, hex) in hex_query.iter() {
                         if *hex == new_selected_hex {
-                           commands.entity(prev_selected_entity).remove::<Selected>();
-                           commands.entity(new_selected_entity).insert(Selected);
+                            commands.entity(prev_selected_entity).remove::<Selected>();
+                            commands.entity(new_selected_entity).insert(Selected);
 
-                           *selected_hex_entity = SelectedHexEntity(Some(new_selected_entity));
+                            *selected_hex_entity = SelectedHexEntity(Some(new_selected_entity));
 
-                           break;
+                            break;
                         }
                     }
                 }

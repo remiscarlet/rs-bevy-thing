@@ -33,7 +33,7 @@ pub fn process_button_input(
             GameState::InGame => {
                 println!("Sending MovePlayer: {:?}", movement);
                 input_writer.send(InputEvent(InputAction::MovePlayer(movement)));
-            },
+            }
             GameState::MainMenu => {
                 println!("Sending NavigateMenu: {:?}", movement);
                 input_writer.send(InputEvent(InputAction::NavigateMenu(movement)));
@@ -79,13 +79,19 @@ pub fn process_cursor_clicked(
                 (GameState::InGame) => {
                     for mouse_button in mouse_buttons.get_just_pressed() {
                         println!("Sending game click: {:?}", mouse_button);
-                        input_writer.send(InputEvent(InputAction::GameClick(*mouse_button, cursor_pos)));
+                        input_writer.send(InputEvent(InputAction::GameClick(
+                            *mouse_button,
+                            cursor_pos,
+                        )));
                     }
-                },
+                }
                 (GameState::MainMenu) => {
                     for mouse_button in mouse_buttons.get_just_pressed() {
                         println!("Sending menu click: {:?}", mouse_button);
-                        input_writer.send(InputEvent(InputAction::MenuClick(*mouse_button, cursor_pos)));
+                        input_writer.send(InputEvent(InputAction::MenuClick(
+                            *mouse_button,
+                            cursor_pos,
+                        )));
                     }
                 }
             };

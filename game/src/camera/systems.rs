@@ -14,7 +14,11 @@ pub struct GameCameraMarker;
 pub struct DebugCameraMarker;
 
 pub fn initialize_camera(mut commands: Commands) {
-    commands.spawn((Camera2d::default(), GameCameraMarker, PlaymodeCamera::default()));
+    commands.spawn((
+        Camera2d::default(),
+        GameCameraMarker,
+        PlaymodeCamera::default(),
+    ));
 
     #[cfg(feature = "devtools")]
     {
