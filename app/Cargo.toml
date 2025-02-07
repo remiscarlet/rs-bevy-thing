@@ -9,4 +9,5 @@ game = { path = "../game" }
 space_editor = {git = "https://github.com/rewin123/space_editor.git", branch = "0.15-dev"}
 
 [features]
-devtools = []
+default = ["devmode"]
+devmode = []

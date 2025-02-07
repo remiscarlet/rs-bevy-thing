@@ -1,4 +1,4 @@
 mod plugin;
 mod systems;
 
-pub use plugin::GameConsolePlugin;
+pub use plugin::DebugConsolePlugin;

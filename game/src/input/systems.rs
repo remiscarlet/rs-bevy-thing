@@ -13,12 +13,24 @@ pub fn process_button_input(
     mut input_writer: EventWriter<InputEvent>,
     game_state: Res<State<GameSceneState>>, // Assume we have some game state
 ) {
-    
+    process_debug_input(&keys, &mut input_writer);
+    process_movement_input(&keys, &mut input_writer, &game_state);
+}
+
+fn process_debug_input(
+    keys: &Res<ButtonInput<KeyCode>>,
+    mut input_writer: &mut EventWriter<InputEvent>,
+) {
     if keys.just_pressed(KeyCode::Backquote) {
-        println!("Sending ToggleDebug");
         input_writer.send(InputEvent(InputAction::ToggleDebug));
     }
+}
 
+fn process_movement_input(
+    keys: &Res<ButtonInput<KeyCode>>,
+    mut input_writer: &mut EventWriter<InputEvent>,
+    game_state: &Res<State<GameSceneState>>,
+) {
     let mut movement = Vec2::ZERO;
 
     if keys.just_pressed(KeyCode::KeyW) {
@@ -46,23 +58,6 @@ pub fn process_button_input(
             }
         };
     }
-    // process_debug_input(&keys, &input_writer);
-    // process_movement_input(&keys, &input_writer, &game_state);
-}
-
-fn process_debug_input(
-    keys: &Res<ButtonInput<KeyCode>>,
-    mut input_writer: &EventWriter<InputEvent>,
-) {
-    
-}
-
-fn process_movement_input(
-    keys: &Res<ButtonInput<KeyCode>>,
-    mut input_writer: &EventWriter<InputEvent>,
-    game_state: &Res<State<GameSceneState>>,
-) {
-    
 }
 
 pub fn process_cursor_moved(

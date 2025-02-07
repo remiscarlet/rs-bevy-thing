@@ -4,7 +4,7 @@ use space_editor::space_prefab::component::camera::PlaymodeCamera;
 
 use crate::{
     input::{InputAction, InputEvent},
-    state::ConfigState,
+    state_manager::ConfigState,
 };
 
 #[derive(Component)]
@@ -20,10 +20,10 @@ pub fn initialize_camera(mut commands: Commands) {
         PlaymodeCamera::default(),
     ));
 
-    #[cfg(feature = "devtools")]
-    {
-        commands.set_state(EditorState::Editor);
-    }
+    // #[cfg(feature = "devmode")]
+    // {
+    //     commands.set_state(EditorState::Editor);
+    // }
 }
 
 pub fn move_camera(

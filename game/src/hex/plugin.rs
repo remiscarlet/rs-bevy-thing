@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{assets::GameAssets, map::Map};
+use crate::{assets::GameAssets, map::Map, state_manager::DebugState};
 
 use super::{systems, SelectedHexEntity};
 
@@ -16,7 +16,14 @@ impl Plugin for HexGridPlugin {
             .add_systems(Update, systems::move_selected_hex)
             .add_systems(Update, systems::update_sprite_colors);
 
-        app.add_systems(Update, draw_sprite_bounding_boxes);
+        app.add_systems(
+            Update,
+            draw_sprite_bounding_boxes.run_if(in_state(DebugState::DebugEnabled)),
+        )
+        .add_systems(
+            Update,
+            debug_parent_transform.run_if(in_state(DebugState::DebugEnabled)),
+        );
         // .add_systems(Update, debug_sprite_size);
     }
 }

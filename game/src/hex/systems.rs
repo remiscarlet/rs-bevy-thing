@@ -7,7 +7,7 @@ use crate::{
     hex::Selected,
     input::{InputAction, InputEvent},
     map::Map,
-    state::ConfigState,
+    state_manager::ConfigState,
 };
 
 use super::{Hex, Highlighted, SelectedHexEntity};
