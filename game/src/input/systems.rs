@@ -1,69 +1,58 @@
-use bevy::{
-    input::mouse::{MouseButtonInput, MouseMotion},
-    math::VectorSpace,
-    prelude::*,
-};
+use bevy::prelude::*;
 
 use crate::GameSceneState;
 
-use super::{InputAction, InputEvent};
+use super::{DebugAction, GameAction, ViewAction};
 
-pub fn process_button_input(
+pub fn process_debug_input(
     keys: Res<ButtonInput<KeyCode>>,
-    mut input_writer: EventWriter<InputEvent>,
-    game_state: Res<State<GameSceneState>>, // Assume we have some game state
-) {
-    process_debug_input(&keys, &mut input_writer);
-    process_movement_input(&keys, &mut input_writer, &game_state);
-}
-
-fn process_debug_input(
-    keys: &Res<ButtonInput<KeyCode>>,
-    mut input_writer: &mut EventWriter<InputEvent>,
+    mut action_writer: EventWriter<DebugAction>,
 ) {
     if keys.just_pressed(KeyCode::Backquote) {
-        input_writer.send(InputEvent(InputAction::ToggleDebug));
+        action_writer.send(DebugAction::ToggleDebug);
     }
 }
 
-fn process_movement_input(
-    keys: &Res<ButtonInput<KeyCode>>,
-    mut input_writer: &mut EventWriter<InputEvent>,
-    game_state: &Res<State<GameSceneState>>,
+pub fn process_game_input(
+    windows: Query<&Window>,
+    mouse_buttons: Res<ButtonInput<MouseButton>>,
+    keys: Res<ButtonInput<KeyCode>>,
+    mut action_writer: EventWriter<GameAction>,
 ) {
-    let mut movement = Vec2::ZERO;
-
     if keys.just_pressed(KeyCode::KeyW) {
-        movement.y += 1.0;
+        action_writer.send(GameAction::Up);
     }
     if keys.just_pressed(KeyCode::KeyS) {
-        movement.y -= 1.0;
+        action_writer.send(GameAction::Down);
     }
     if keys.just_pressed(KeyCode::KeyA) {
-        movement.x -= 1.0;
+        action_writer.send(GameAction::Left);
     }
     if keys.just_pressed(KeyCode::KeyD) {
-        movement.x += 1.0;
+        action_writer.send(GameAction::Right);
     }
 
-    if movement != Vec2::ZERO {
-        match game_state.get() {
-            GameSceneState::InGame => {
-                println!("Sending MovePlayer: {:?}", movement);
-                input_writer.send(InputEvent(InputAction::MovePlayer(movement)));
+    if let Ok(window) = windows.get_single() {
+        if let Some(cursor_pos) = window.cursor_position() {
+            for mouse_button in mouse_buttons.get_just_pressed() {
+                match mouse_button {
+                    MouseButton::Left => {
+                        println!("Sending game click: {:?}", mouse_button);
+                        action_writer.send(GameAction::Click(cursor_pos));
+                    }
+                    _ => {
+                        println!("Uncaught mouse button: {:?}", mouse_button);
+                    }
+                }
             }
-            GameSceneState::MainMenu => {
-                println!("Sending NavigateMenu: {:?}", movement);
-                input_writer.send(InputEvent(InputAction::NavigateMenu(movement)));
-            }
-        };
+        }
     }
 }
 
-pub fn process_cursor_moved(
+pub fn process_view_input(
     mut cursor_moved_reader: EventReader<CursorMoved>,
     mouse_buttons: Res<ButtonInput<MouseButton>>,
-    mut input_writer: EventWriter<InputEvent>,
+    mut action_writer: EventWriter<ViewAction>,
     game_state: Res<State<GameSceneState>>,
 ) {
     let mut movement = Vec2::ZERO;
@@ -78,41 +67,9 @@ pub fn process_cursor_moved(
         match (game_state.get(), mouse_buttons.pressed(MouseButton::Right)) {
             (GameSceneState::InGame, true) => {
                 println!("Sending movement: {:?}", movement);
-                input_writer.send(InputEvent(InputAction::DragCamera(movement)));
+                action_writer.send(ViewAction::DragCamera(movement));
             }
             _ => (),
         };
-    }
-}
-
-pub fn process_cursor_clicked(
-    windows: Query<&Window>,
-    mouse_buttons: Res<ButtonInput<MouseButton>>,
-    mut input_writer: EventWriter<InputEvent>,
-    game_state: Res<State<GameSceneState>>,
-) {
-    if let Ok(window) = windows.get_single() {
-        if let Some(cursor_pos) = window.cursor_position() {
-            match (game_state.get()) {
-                (GameSceneState::InGame) => {
-                    for mouse_button in mouse_buttons.get_just_pressed() {
-                        println!("Sending game click: {:?}", mouse_button);
-                        input_writer.send(InputEvent(InputAction::GameClick(
-                            *mouse_button,
-                            cursor_pos,
-                        )));
-                    }
-                }
-                (GameSceneState::MainMenu) => {
-                    for mouse_button in mouse_buttons.get_just_pressed() {
-                        println!("Sending menu click: {:?}", mouse_button);
-                        input_writer.send(InputEvent(InputAction::MenuClick(
-                            *mouse_button,
-                            cursor_pos,
-                        )));
-                    }
-                }
-            };
-        }
     }
 }

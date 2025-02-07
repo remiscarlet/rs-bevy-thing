@@ -1,1 +1,30 @@
-/target
+app/assets/
+
+# Rust target directory (compiled output)
+target/
+
+# Build scripts and temporary files
+**/*.rs.bk
+**/*.rs~
+*.rs.bk
+*.rs~
+
+# Cargo-related files
+**/*.rs.bk
+**/*.rs~
+Cargo.lock
+.cargo/
+.cargo-checksum.json
+
+# Bevy-specific build files and caches
+assets_baked/
+.build_cache/
+**/config.b
+
+# OS-specific files
+**/.DS_Store
+**/Thumbs.db
+**/Desktop.ini
+**/ehthumbs.db
+**/.AppleDouble
+**/.LSOverride

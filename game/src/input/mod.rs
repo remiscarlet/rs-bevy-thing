@@ -5,14 +5,30 @@ mod systems;
 
 pub use plugin::InputPlugin;
 
-pub enum InputAction {
-    MovePlayer(Vec2),
-    GameClick(MouseButton, Vec2),
-    MenuClick(MouseButton, Vec2),
-    ToggleDebug,
-    DragCamera(Vec2),
-    NavigateMenu(Vec2),
+#[derive(Event, PartialEq, Debug)]
+pub enum GameAction {
+    Click(Vec2),
+    Select,
+    Cancel,
+    Left,
+    Right,
+    Up,
+    Down,
+    Context,
+    UnitDetails,
+    TerrainDetails,
 }
 
-#[derive(Event)]
-pub struct InputEvent(pub InputAction);
+#[derive(Event, PartialEq, Debug)]
+pub enum ViewAction {
+    DragCamera(Vec2),
+    ZoomIn(Vec2),
+    ZoomOut(Vec2),
+}
+
+#[derive(Event, PartialEq, Debug)]
+pub enum DebugAction {
+    ToggleDebug,
+    DebugOff,
+    DebugOn,
+}

@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use bevy::prelude::*;
 
+use event_handlers::EventHandlerPlugin;
 use space_editor::SpaceEditorPlugin;
 
 use crate::assets::GameAssetPlugin;
@@ -15,6 +16,7 @@ use crate::state_manager::{GameSceneState, StatePlugin};
 mod assets;
 mod camera;
 mod console;
+mod event_handlers;
 mod hex;
 mod input;
 mod map;
@@ -31,6 +33,7 @@ impl Plugin for GamePlugin {
             .add_plugins(HexGridPlugin)
             .add_plugins(StatePlugin)
             .add_plugins(MapPlugin)
+            .add_plugins(EventHandlerPlugin)
             .add_systems(OnEnter(GameSceneState::InGame), on_ingame_enter);
 
         // Can't add both bevy-consol and space_editor at the same time.

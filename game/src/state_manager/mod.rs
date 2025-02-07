@@ -5,11 +5,11 @@
 
 use bevy::prelude::*;
 
-mod debug;
 mod plugin;
-mod systems;
 
 pub use plugin::StatePlugin;
+
+use crate::hex::Hex;
 
 /*
  * Resources
@@ -29,7 +29,7 @@ pub struct ConfigState {
 
 #[derive(Resource)]
 pub struct GameRuntimeState {
-    pub debug: bool,
+    pub selected_hex_entity: Option<Entity>,
 }
 
 /*

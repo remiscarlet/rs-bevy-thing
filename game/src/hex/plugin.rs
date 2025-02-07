@@ -11,18 +11,13 @@ impl Plugin for HexGridPlugin {
         app.insert_resource(SelectedHexEntity(None))
             .add_systems(Update, systems::initialize_map_hex)
             .add_systems(Update, systems::log_new_hex)
-            .add_systems(Update, systems::select_clicked_hex)
             .add_systems(Update, systems::highlight_hovered_hex)
-            .add_systems(Update, systems::move_selected_hex)
             .add_systems(Update, systems::update_sprite_colors);
 
         app.add_systems(
             Update,
-            draw_sprite_bounding_boxes.run_if(in_state(DebugState::DebugEnabled)),
-        )
-        .add_systems(
-            Update,
-            debug_parent_transform.run_if(in_state(DebugState::DebugEnabled)),
+            (draw_sprite_bounding_boxes, debug_parent_transform)
+                .run_if(in_state(DebugState::DebugEnabled)),
         );
         // .add_systems(Update, debug_sprite_size);
     }

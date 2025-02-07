@@ -3,10 +3,7 @@ use std::u32;
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{
-    camera::GameCameraMarker,
-    hex::Selected,
-    input::{InputAction, InputEvent},
-    map::Map,
+    camera::GameCameraMarker, hex::Selected, input::GameAction, map::Map,
     state_manager::ConfigState,
 };
 
@@ -91,86 +88,6 @@ pub fn highlight_hovered_hex(
                     }
 
                     *previous_highlighted = closest_hex_entity;
-                }
-            }
-        }
-    }
-}
-
-pub fn select_clicked_hex(
-    mut commands: Commands,
-    hex_query: Query<(Entity, &Hex)>,
-    camera_query: Query<(&Camera, &GlobalTransform)>,
-    mut input_reader: EventReader<InputEvent>,
-    mut selected_hex_entity: ResMut<SelectedHexEntity>,
-    config: Res<ConfigState>,
-) {
-    let mut clicked_hex_entity: Option<Entity> = None;
-
-    let (camera, camera_transform) = camera_query.single();
-    for event in input_reader.read() {
-        if let InputEvent(InputAction::GameClick(MouseButton::Left, cursor_pos)) = event {
-            if let Ok(world_pos) = camera.viewport_to_world_2d(camera_transform, *cursor_pos) {
-                let clicked_hex = Hex::world_to_hex(world_pos, config.hex_size);
-                println!(
-                    "{:?} at {:?} (world_pos: {:?}). Clicked hex: {:?}",
-                    MouseButton::Left,
-                    cursor_pos,
-                    world_pos,
-                    clicked_hex
-                );
-
-                for (entity, hex) in hex_query.iter() {
-                    if *hex == clicked_hex {
-                        clicked_hex_entity = Some(entity);
-                    }
-                }
-
-                if *selected_hex_entity != SelectedHexEntity(clicked_hex_entity) {
-                    if let SelectedHexEntity(Some(prev_selected_entity)) = *selected_hex_entity {
-                        commands.entity(prev_selected_entity).remove::<Selected>();
-                    }
-
-                    if let Some(clicked_entity) = clicked_hex_entity {
-                        commands.entity(clicked_entity).insert(Selected);
-                    }
-
-                    *selected_hex_entity = SelectedHexEntity(clicked_hex_entity);
-                }
-            }
-        }
-    }
-}
-
-pub fn move_selected_hex(
-    mut commands: Commands,
-    hex_query: Query<(Entity, &Hex)>,
-    mut input_reader: EventReader<InputEvent>,
-    mut selected_hex_entity: ResMut<SelectedHexEntity>,
-) {
-    for event in input_reader.read() {
-        if let InputEvent(InputAction::MovePlayer(direction)) = event {
-            if let SelectedHexEntity(Some(selected_entity)) = *selected_hex_entity {
-                if let Ok((prev_selected_entity, prev_selected_hex)) =
-                    hex_query.get(selected_entity)
-                {
-                    let (mut q, mut r) = prev_selected_hex.to_axial();
-
-                    q += direction.x.round() as i32;
-                    r += direction.y.round() as i32;
-
-                    let new_selected_hex = Hex::from_axial(q, r);
-
-                    for (new_selected_entity, hex) in hex_query.iter() {
-                        if *hex == new_selected_hex {
-                            commands.entity(prev_selected_entity).remove::<Selected>();
-                            commands.entity(new_selected_entity).insert(Selected);
-
-                            *selected_hex_entity = SelectedHexEntity(Some(new_selected_entity));
-
-                            break;
-                        }
-                    }
                 }
             }
         }

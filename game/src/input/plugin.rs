@@ -1,15 +1,19 @@
 use bevy::prelude::*;
 
 use super::systems;
-use super::InputEvent;
+use super::DebugAction;
+use super::GameAction;
+use super::ViewAction;
 
 pub struct InputPlugin;
 
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<InputEvent>()
-            .add_systems(Update, systems::process_button_input)
-            .add_systems(Update, systems::process_cursor_clicked)
-            .add_systems(Update, systems::process_cursor_moved);
+        app.add_event::<DebugAction>()
+            .add_event::<GameAction>()
+            .add_event::<ViewAction>()
+            .add_systems(Update, systems::process_debug_input)
+            .add_systems(Update, systems::process_game_input)
+            .add_systems(Update, systems::process_view_input);
     }
 }

@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 bevy = { version = "0.15.1", features = ["bevy_gizmos"] }
-bevy_console = { version = "0.13.1", features = [""] }
+bevy_console = { version = "0.13.1" }
 clap = { version = "4.5.28", features = ["derive"] }
 space_editor = {git = "https://github.com/rewin123/space_editor.git", branch = "0.15-dev"}
 
