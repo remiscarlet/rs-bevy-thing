@@ -2,18 +2,15 @@ use std::u32;
 
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use crate::{
-    camera::GameCameraMarker, hex::Selected, input::GameAction, map::Map,
-    state_manager::ConfigState,
-};
+use crate::{camera::GameCameraMarker, hex::Selected, map::Map, state_manager::ConfigState};
 
-use super::{Hex, Highlighted, SelectedHexEntity};
+use super::{Hex, HexTile, Highlighted, SelectedHexEntity};
 use crate::assets::GameAssets;
 
-pub fn log_new_hex(query: Query<(&Hex, &Transform), Added<Hex>>) {
-    for (Hex { q, r, s }, transform) in query.iter() {
+pub fn log_new_hex(query: Query<(&HexTile, &Transform), Added<HexTile>>) {
+    for (HexTile(Hex { q, r, s }), transform) in query.iter() {
         println!(
-            "Spawning new Hex entity at ({}, {}, {}) in ({}, {})",
+            "Spawning new HexTile entity at ({}, {}, {}) in ({}, {})",
             q, r, s, transform.translation.x, transform.translation.y
         );
     }
@@ -42,7 +39,7 @@ pub fn initialize_map_hex(
                     .spawn((
                         sprite,
                         Transform::from_xyz(position.x, position.y, 0.0),
-                        hex,
+                        HexTile(hex),
                         Name::new(format!("Hex ({}, {})", q, r)),
                     ))
                     .set_parent(map_entity); // Attach to the Map entity
@@ -53,7 +50,7 @@ pub fn initialize_map_hex(
 
 pub fn highlight_hovered_hex(
     mut commands: Commands,
-    mut query: Query<(Entity, &Hex)>,
+    mut query: Query<(Entity, &HexTile)>,
     mut previous_highlighted: Local<Option<Entity>>,
     config: Res<ConfigState>,
     windows: Query<&Window, With<PrimaryWindow>>,
@@ -70,7 +67,7 @@ pub fn highlight_hovered_hex(
                 let cursor_hex = Hex::world_to_hex(world_pos, config.hex_size);
 
                 // Find Entity for tile we're hovering over
-                for (entity, hex) in query.iter_mut() {
+                for (entity, HexTile(hex)) in query.iter_mut() {
                     let distance = cursor_hex.distance_to(hex);
                     if distance < closest_dist {
                         closest_dist = distance;

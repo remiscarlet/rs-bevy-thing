@@ -2,10 +2,14 @@ use bevy::prelude::*;
 use bevy_console::{AddConsoleCommand, ConsoleCommand};
 use clap::{command, Parser};
 
-use crate::{
-    input::DebugAction,
-    state_manager::{self, DebugState},
-};
+use crate::state_manager::{self, DebugState};
+
+#[derive(Event, PartialEq, Debug)]
+pub enum DebugAction {
+    ToggleDebug,
+    DebugOff,
+    DebugOn,
+}
 
 pub fn debug_action_event_handler(
     curr_game_state: Res<State<DebugState>>,

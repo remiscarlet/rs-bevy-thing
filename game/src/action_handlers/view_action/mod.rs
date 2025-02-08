@@ -1,6 +1,13 @@
 use bevy::prelude::*;
 
-use crate::{camera::GameCameraMarker, input::ViewAction, state_manager::ConfigState};
+use crate::{camera::GameCameraMarker, state_manager::ConfigState};
+
+#[derive(Event, PartialEq, Debug)]
+pub enum ViewAction {
+    DragCamera(Vec2),
+    ZoomIn(Vec2),
+    ZoomOut(Vec2),
+}
 
 pub fn view_action_event_handler(
     mut camera_query: Query<&mut Transform, With<GameCameraMarker>>,

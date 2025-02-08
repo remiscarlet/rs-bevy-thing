@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 
+use crate::action_handlers::{DebugAction, GameAction, ViewAction};
+
 use super::systems;
-use super::DebugAction;
-use super::GameAction;
-use super::ViewAction;
 
 pub struct InputPlugin;
 

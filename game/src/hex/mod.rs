@@ -19,6 +19,9 @@ pub struct Hex {
     s: i32, // Derived from q and r: s = -q - r
 }
 
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct HexTile(pub Hex);
+
 impl Hex {
     /// Create a new hex coordinate ensuring the constraint q + r + s = 0
     pub fn new(q: i32, r: i32) -> Self {

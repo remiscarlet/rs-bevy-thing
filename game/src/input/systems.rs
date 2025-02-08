@@ -1,14 +1,15 @@
 use bevy::prelude::*;
 
-use crate::GameSceneState;
-
-use super::{DebugAction, GameAction, ViewAction};
+use crate::{
+    action_handlers::{DebugAction, GameAction, ViewAction},
+    GameSceneState,
+};
 
 pub fn process_debug_input(
     keys: Res<ButtonInput<KeyCode>>,
     mut action_writer: EventWriter<DebugAction>,
 ) {
-    if keys.just_pressed(KeyCode::Backquote) {
+    if keys.just_pressed(KeyCode::F1) {
         action_writer.send(DebugAction::ToggleDebug);
     }
 }

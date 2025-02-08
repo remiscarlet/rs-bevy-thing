@@ -3,11 +3,15 @@ use bevy_console::AddConsoleCommand;
 use debug_action::ToggleDebugCommand;
 use game_action::{MoveSelectedHexCommand, SelectClickedHex};
 
-use crate::state_manager::{DebugState, GameSceneState};
+use crate::state_manager::GameSceneState;
 
 mod debug_action;
 mod game_action;
 mod view_action;
+
+pub use debug_action::DebugAction;
+pub use game_action::GameAction;
+pub use view_action::ViewAction;
 
 pub struct EventHandlerPlugin;
 
