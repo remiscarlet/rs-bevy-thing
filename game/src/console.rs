@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 use bevy_console::{AddConsoleCommand, ConsoleConfiguration, ConsolePlugin};
 
-use super::systems;
-use systems::ExampleCommand;
-
 pub struct DebugConsolePlugin;
 
 impl Plugin for DebugConsolePlugin {
@@ -12,7 +9,6 @@ impl Plugin for DebugConsolePlugin {
             .insert_resource(ConsoleConfiguration {
                 // override config here
                 ..Default::default()
-            })
-            .add_console_command::<ExampleCommand, _>(systems::example_command);
+            });
     }
 }

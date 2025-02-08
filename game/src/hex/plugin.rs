@@ -16,8 +16,7 @@ impl Plugin for HexGridPlugin {
 
         app.add_systems(
             Update,
-            (draw_sprite_bounding_boxes, debug_parent_transform)
-                .run_if(in_state(DebugState::DebugEnabled)),
+            (draw_sprite_bounding_boxes).run_if(in_state(DebugState::DebugEnabled)),
         );
         // .add_systems(Update, debug_sprite_size);
     }

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{camera::GameCameraMarker, input::ViewAction, state_manager::ConfigState};
 
-pub fn view_action_handler(
+pub fn view_action_event_handler(
     mut camera_query: Query<&mut Transform, With<GameCameraMarker>>,
     mut action_reader: EventReader<ViewAction>,
     time: Res<Time>,

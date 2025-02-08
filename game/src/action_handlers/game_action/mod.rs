@@ -1,12 +1,15 @@
 use bevy::prelude::*;
+use bevy_console::ConsoleCommand;
+use clap::{command, Parser};
 
 use crate::{
     hex::{Hex, Selected},
     input::GameAction,
     state_manager::{ConfigState, GameRuntimeState},
+    utils::process_console_command,
 };
 
-pub fn game_action_handler(
+pub fn game_action_event_handler(
     mut commands: Commands,
     hex_query: Query<(Entity, &Hex)>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
@@ -67,6 +70,37 @@ pub fn game_action_handler(
     }
 }
 
+#[derive(Parser, ConsoleCommand)]
+#[command(name = "select_clicked_hex")]
+pub struct SelectClickedHex {
+    x: f32,
+    y: f32,
+}
+pub fn select_clicked_hex_command(
+    mut commands: Commands,
+    hex_query: Query<(Entity, &Hex)>,
+    camera_query: Query<(&Camera, &GlobalTransform)>,
+    config_state: Res<ConfigState>,
+    mut runtime_state: ResMut<GameRuntimeState>,
+    mut clicked_cmd: ConsoleCommand<SelectClickedHex>,
+) {
+    let (camera, camera_transform) = camera_query.single();
+    match process_console_command(clicked_cmd) {
+        Some(cmd) => {
+            select_clicked_hex(
+                &mut commands,
+                &hex_query,
+                &config_state,
+                &mut runtime_state,
+                &camera,
+                &camera_transform,
+                &Vec2::from([cmd.x, cmd.y]),
+            );
+        }
+        _ => {}
+    };
+}
+
 fn select_clicked_hex(
     mut commands: &mut Commands,
     hex_query: &Query<(Entity, &Hex)>,
@@ -105,6 +139,66 @@ fn select_clicked_hex(
 
             runtime_state.selected_hex_entity = clicked_hex_entity;
         }
+    }
+}
+
+#[derive(Parser, ConsoleCommand)]
+#[command(name = "move_selected_hex_command")]
+pub struct MoveSelectedHexCommand {
+    #[arg(short, long, action = clap::ArgAction::SetTrue)]
+    up: bool,
+    #[arg(short, long, action = clap::ArgAction::SetTrue)]
+    down: bool,
+    #[arg(short, long, action = clap::ArgAction::SetTrue)]
+    left: bool,
+    #[arg(short, long, action = clap::ArgAction::SetTrue)]
+    right: bool,
+}
+fn move_selected_hex_completions(_: clap::ValueHint, args: &[String]) -> Vec<String> {
+    let options = vec![
+        "--up".to_string(),
+        "--down".to_string(),
+        "--left".to_string(),
+        "--right".to_string(),
+    ];
+
+    if let Some(last_arg) = args.last() {
+        options
+            .into_iter()
+            .filter(|option| option.starts_with(last_arg))
+            .collect()
+    } else {
+        options
+    }
+}
+pub fn move_selected_hex_command(
+    mut commands: Commands,
+    hex_query: Query<(Entity, &Hex)>,
+    mut runtime_state: ResMut<GameRuntimeState>,
+    mut move_cmd: ConsoleCommand<MoveSelectedHexCommand>,
+) {
+    match process_console_command(move_cmd) {
+        Some(cmd) => {
+            println!(
+                "Moving hex: up={} down={} left={} right={}",
+                cmd.up, cmd.down, cmd.left, cmd.right
+            );
+            let mut direction = Vec2::ZERO;
+            if cmd.up {
+                direction.y += 1.0;
+            }
+            if cmd.down {
+                direction.y -= 1.0;
+            }
+            if cmd.left {
+                direction.x -= 1.0;
+            }
+            if cmd.right {
+                direction.x += 1.0;
+            }
+            move_selected_hex(&mut commands, &hex_query, &mut runtime_state, direction);
+        }
+        _ => {}
     }
 }
 

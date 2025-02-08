@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use bevy::prelude::*;
 
-use event_handlers::EventHandlerPlugin;
+use action_handlers::EventHandlerPlugin;
 use space_editor::SpaceEditorPlugin;
 
 use crate::assets::GameAssetPlugin;
@@ -12,15 +12,18 @@ use crate::hex::HexGridPlugin;
 use crate::input::InputPlugin;
 use crate::map::MapPlugin;
 use crate::state_manager::{GameSceneState, StatePlugin};
+use crate::units::UnitsPlugin;
 
+mod action_handlers;
 mod assets;
 mod camera;
 mod console;
-mod event_handlers;
 mod hex;
 mod input;
 mod map;
 mod state_manager;
+mod units;
+mod utils;
 
 pub struct GamePlugin;
 
@@ -34,9 +37,10 @@ impl Plugin for GamePlugin {
             .add_plugins(StatePlugin)
             .add_plugins(MapPlugin)
             .add_plugins(EventHandlerPlugin)
+            .add_plugins(UnitsPlugin)
             .add_systems(OnEnter(GameSceneState::InGame), on_ingame_enter);
 
-        // Can't add both bevy-consol and space_editor at the same time.
+        // Can't add both bevy-console and space_editor at the same time.
         // Both utilize the Egui plugin, meaning if both are enabled Bevy panics due to adding duplicate plugins.
         // #[cfg(feature = "devmode")]
         // {
