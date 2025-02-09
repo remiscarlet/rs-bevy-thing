@@ -7,10 +7,7 @@ pub fn process_console_command<T>(mut cmd: ConsoleCommand<T>) -> Option<T> {
         Some(Err(err)) => {
             eprintln!("Could not execute command: {:?}", err);
             None
-        }
-        None => {
-            eprintln!("'.take() returned None???");
-            None
-        }
+        },
+        None => None
     }
 }

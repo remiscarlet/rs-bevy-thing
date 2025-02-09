@@ -8,6 +8,8 @@ use crate::{
     utils::process_console_command,
 };
 
+use super::GameAction;
+
 #[derive(Parser, ConsoleCommand)]
 #[command(name = "select_clicked_hex")]
 pub struct SelectClickedHex {
@@ -15,28 +17,12 @@ pub struct SelectClickedHex {
     y: f32,
 }
 pub fn select_clicked_hex_command(
-    mut commands: Commands,
-    hex_query: Query<(Entity, &HexTile)>,
-    camera_query: Query<(&Camera, &GlobalTransform)>,
-    config_state: Res<ConfigState>,
-    mut runtime_state: ResMut<GameRuntimeState>,
+    mut action_writer: EventWriter<GameAction>,
     mut clicked_cmd: ConsoleCommand<SelectClickedHex>,
 ) {
-    let (camera, camera_transform) = camera_query.single();
-    match process_console_command(clicked_cmd) {
-        Some(cmd) => {
-            select_clicked_hex(
-                &mut commands,
-                &hex_query,
-                &config_state,
-                &mut runtime_state,
-                &camera,
-                &camera_transform,
-                &Vec2::from([cmd.x, cmd.y]),
-            );
-        }
-        _ => {}
-    };
+    if let Some(cmd) = process_console_command(clicked_cmd) {
+        action_writer.send(GameAction::Click(Vec2::new(cmd.x, cmd.y)));
+    }
 }
 
 pub fn select_clicked_hex(
@@ -94,33 +80,19 @@ pub struct MoveSelectedHexCommand {
 }
 
 pub fn move_selected_hex_command(
-    mut commands: Commands,
-    hex_query: Query<(Entity, &HexTile)>,
-    mut runtime_state: ResMut<GameRuntimeState>,
+    mut action_writer: EventWriter<GameAction>,
     mut move_cmd: ConsoleCommand<MoveSelectedHexCommand>,
 ) {
-    match process_console_command(move_cmd) {
-        Some(cmd) => {
-            println!(
-                "Moving hex: up={} down={} left={} right={}",
-                cmd.up, cmd.down, cmd.left, cmd.right
-            );
-            let mut direction = Vec2::ZERO;
-            if cmd.up {
-                direction.y += 1.0;
-            }
-            if cmd.down {
-                direction.y -= 1.0;
-            }
-            if cmd.left {
-                direction.x -= 1.0;
-            }
-            if cmd.right {
-                direction.x += 1.0;
-            }
-            move_selected_hex(&mut commands, &hex_query, &mut runtime_state, direction);
+    if let Some(cmd) = process_console_command(move_cmd) {
+        if cmd.up {
+            action_writer.send(GameAction::Up);
+        } else if cmd.down {
+            action_writer.send(GameAction::Down);
+        } else if cmd.left {
+            action_writer.send(GameAction::Left);
+        } else if cmd.right {
+            action_writer.send(GameAction::Right);
         }
-        _ => {}
     }
 }
 

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_console::{AddConsoleCommand, ConsoleCommand};
 use clap::{command, Parser};
 
-use crate::state_manager::{self, DebugState};
+use crate::{state_manager::{self, DebugState}, utils::process_console_command};
 
 #[derive(Event, PartialEq, Debug)]
 pub enum DebugAction {
@@ -18,6 +18,7 @@ pub fn debug_action_event_handler(
 ) {
     for event in action_reader.read() {
         if DebugAction::ToggleDebug == *event {
+            println!("Calling toggle_debug from action handler");
             toggle_debug(&curr_game_state, &mut next_game_state)
         }
     }
@@ -25,15 +26,15 @@ pub fn debug_action_event_handler(
 
 #[derive(Parser, ConsoleCommand)]
 #[command(name = "toggle_debug_command")]
-pub struct ToggleDebugCommand {
-    x: f32,
-    y: f32,
-}
+pub struct ToggleDebugCommand;
 pub fn toggle_debug_command(
-    curr_game_state: Res<State<DebugState>>,
-    mut next_game_state: ResMut<NextState<DebugState>>,
+    toggle_cmd: ConsoleCommand<ToggleDebugCommand>,
+    mut action_writer: EventWriter<DebugAction>,
 ) {
-    toggle_debug(&curr_game_state, &mut next_game_state);
+    if let Some(_cmd) = process_console_command(toggle_cmd) {
+        println!("Calling toggle_debug from command handler");
+        action_writer.send(DebugAction::ToggleDebug);
+    }
 }
 
 fn toggle_debug(
@@ -44,5 +45,6 @@ fn toggle_debug(
         DebugState::DebugDisabled => DebugState::DebugEnabled,
         DebugState::DebugEnabled => DebugState::DebugDisabled,
     };
+    println!("Toggling debug to: {:?}", &new_state);
     next_game_state.set(new_state);
 }
