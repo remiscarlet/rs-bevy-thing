@@ -4,7 +4,8 @@ use clap::{command, Parser};
 use hex::{move_selected_hex, select_clicked_hex};
 
 use crate::{
-    hex::HexTile,
+    hex::Hex,
+    map::MapTile,
     state_manager::{ConfigState, GameRuntimeState},
 };
 
@@ -27,7 +28,7 @@ pub enum GameAction {
 
 pub fn game_action_event_handler(
     mut commands: Commands,
-    hex_query: Query<(Entity, &HexTile)>,
+    tile_query: Query<(Entity, &Hex, &MapTile)>,
     camera_query: Query<(&Camera, &GlobalTransform)>,
     mut action_reader: EventReader<GameAction>,
     config_state: Res<ConfigState>,
@@ -39,7 +40,7 @@ pub fn game_action_event_handler(
             GameAction::Click(cursor_pos) => {
                 select_clicked_hex(
                     &mut commands,
-                    &hex_query,
+                    &tile_query,
                     &config_state,
                     &mut runtime_state,
                     camera,
@@ -58,7 +59,7 @@ pub fn game_action_event_handler(
                     Vec2::new(0.0, -1.0)
                 };
 
-                move_selected_hex(&mut commands, &hex_query, &mut runtime_state, direction);
+                move_selected_hex(&mut commands, &tile_query, &mut runtime_state, direction);
             }
             _ => {
                 println!("Unhandled GameAction: {:?}", event);

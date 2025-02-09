@@ -3,7 +3,8 @@ use bevy_console::ConsoleCommand;
 use clap::{command, Parser};
 
 use crate::{
-    hex::{Hex, HexTile, Selected},
+    hex::{Hex, Selected},
+    map::MapTile,
     state_manager::{ConfigState, GameRuntimeState},
     utils::process_console_command,
 };
@@ -27,7 +28,7 @@ pub fn select_clicked_hex_command(
 
 pub fn select_clicked_hex(
     mut commands: &mut Commands,
-    hex_query: &Query<(Entity, &HexTile)>,
+    tile_query: &Query<(Entity, &Hex, &MapTile)>,
     config_state: &Res<ConfigState>,
     mut runtime_state: &mut ResMut<GameRuntimeState>,
     camera: &Camera,
@@ -46,7 +47,7 @@ pub fn select_clicked_hex(
             clicked_hex
         );
 
-        for (entity, HexTile(hex)) in hex_query.iter() {
+        for (entity, hex, _map_tile_marker) in tile_query.iter() {
             if *hex == clicked_hex {
                 clicked_hex_entity = Some(entity);
             }
@@ -98,13 +99,13 @@ pub fn move_selected_hex_command(
 
 pub fn move_selected_hex(
     mut commands: &mut Commands,
-    hex_query: &Query<(Entity, &HexTile)>,
+    tile_query: &Query<(Entity, &Hex, &MapTile)>,
     mut runtime_state: &mut ResMut<GameRuntimeState>,
     direction: Vec2,
 ) {
     if let Some(selected_entity) = runtime_state.selected_hex_entity {
-        if let Ok((prev_selected_entity, HexTile(prev_selected_hex))) =
-            hex_query.get(selected_entity)
+        if let Ok((prev_selected_entity, prev_selected_hex, _map_tile_marker)) =
+            tile_query.get(selected_entity)
         {
             let (mut q, mut r) = prev_selected_hex.to_axial();
 
@@ -113,7 +114,7 @@ pub fn move_selected_hex(
 
             let new_selected_hex = Hex::from_axial(q, r);
 
-            for (new_selected_entity, HexTile(hex)) in hex_query.iter() {
+            for (new_selected_entity, hex, _map_tile_marker) in tile_query.iter() {
                 if *hex == new_selected_hex {
                     commands.entity(prev_selected_entity).remove::<Selected>();
                     commands.entity(new_selected_entity).insert(Selected);

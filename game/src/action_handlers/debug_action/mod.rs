@@ -2,7 +2,10 @@ use bevy::prelude::*;
 use bevy_console::{AddConsoleCommand, ConsoleCommand};
 use clap::{command, Parser};
 
-use crate::{state_manager::{self, DebugState}, utils::process_console_command};
+use crate::{
+    state_manager::{self, DebugState},
+    utils::process_console_command,
+};
 
 #[derive(Event, PartialEq, Debug)]
 pub enum DebugAction {

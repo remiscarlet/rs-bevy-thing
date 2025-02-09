@@ -9,8 +9,6 @@ mod plugin;
 
 pub use plugin::StatePlugin;
 
-use crate::hex::Hex;
-
 /*
  * Resources
  */

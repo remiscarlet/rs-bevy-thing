@@ -3,7 +3,9 @@ use bevy::prelude::*;
 mod plugin;
 mod systems;
 
-#[derive(Component)]
+pub use plugin::MapPlugin;
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Map {
     pub width: u16,
     pub height: u16,
@@ -19,4 +21,11 @@ impl Map {
     }
 }
 
-pub use plugin::MapPlugin;
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct MapTile;
+impl MapTile {
+    pub fn new() -> Self {
+        println!("Spawning new MapTile");
+        Self {}
+    }
+}
